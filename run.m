@@ -9,16 +9,21 @@ delete(gcp('nocreate'));
 parpool('SpmdEnabled',false);
 pctRunOnAll warning('off', 'all');
 
-[path_base,~,~] = fileparts(mfilename('fullpath'));
+path = matlab.desktop.editor.getActiveFilename;
+%fprintf('%s\n',path);
+
+%[path_base,~,~] = fileparts(mfilename('fullpath'));
+[path_base,~,~] = fileparts(path);
 
 if (~strcmpi(path_base(end),filesep()))
-    path_base = [path_base filesep()];
+    % The file separator "/" is the character that separates individual folder and file names in a path.
+    path_base = [path_base filesep()]; 
 end
 
 if (~isempty(regexpi(path_base,'Editor')))
     path_base_fs = dir(path_base);
     is_live = ~all(cellfun(@isempty,regexpi({path_base_fs.name},'LiveEditorEvaluationHelper')));
-
+        % "@" https://uk.mathworks.com/matlabcentral/answers/320129-what-does-do
     if (is_live)
         pwd_current = pwd();
 
@@ -57,6 +62,7 @@ for i = numel(paths_base):-1:1
     path_current = paths_base{i};
 
     if (~strcmp(path_current,path_base) && isempty(regexpi(path_current,[filesep() 'Scripts'])))
+        % Note: [filesep() 'Scripts'] --> "/Scripts"
         paths_base(i) = [];
     end
 end
